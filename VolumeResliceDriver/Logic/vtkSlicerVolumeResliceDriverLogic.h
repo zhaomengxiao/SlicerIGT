@@ -15,7 +15,6 @@
 
 // STD includes
 #include <cstdlib>
-
 #include "vtkSlicerVolumeResliceDriverModuleLogicExport.h"
 
 class vtkMRMLLinearTransformNode;
@@ -42,6 +41,7 @@ public:
   static vtkSlicerVolumeResliceDriverLogic *New();
   vtkTypeMacro(vtkSlicerVolumeResliceDriverLogic,vtkSlicerModuleLogic);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+  friend class qViewWidget;
   
   enum {
     MODE_NONE,
@@ -63,7 +63,7 @@ protected:
   
   void AddObservedNode( vtkMRMLTransformableNode* node );
   void ClearObservedNodes();
-  
+
   vtkSlicerVolumeResliceDriverLogic();
   virtual ~vtkSlicerVolumeResliceDriverLogic();
 
@@ -82,12 +82,13 @@ protected:
   void UpdateSliceByImageNode( vtkMRMLScalarVolumeNode* inode, vtkMRMLSliceNode* sliceNode );
   void UpdateSliceByMarkupsNode(vtkMRMLMarkupsNode* markupsNode, vtkMRMLSliceNode* sliceNode);
   void UpdateSliceByRulerNode( vtkMRMLAnnotationRulerNode* rnode, vtkMRMLSliceNode* sliceNode );
+  void UpdateSliceByPoint(double posistion1[3], vtkMRMLSliceNode* slcieNode);
   void UpdateSlice( vtkMatrix4x4* driverToRASMatrix, vtkMRMLSliceNode* sliceNode );
   void UpdateSliceByLine(double position1[3], double position2[3], vtkMRMLSliceNode* sliceNode);
   void UpdateSliceIfObserved( vtkMRMLSliceNode* sliceNode );
   
   std::vector< vtkMRMLTransformableNode* > ObservedNodes;
-  
+
 private:
 
   vtkSlicerVolumeResliceDriverLogic(const vtkSlicerVolumeResliceDriverLogic&); // Not implemented

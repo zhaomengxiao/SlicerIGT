@@ -1,3 +1,4 @@
+#include "vtkSlicerVolumeResliceDriverLogic.h"
 /*==============================================================================
 
   Program: 3D Slicer
@@ -36,6 +37,7 @@
 #include <vtkNew.h>
 #include <vtkTransform.h>
 #include <vtkObjectFactory.h>
+#include <vtkMRMLMarkupsFiducialNode.h>
 
 
 vtkStandardNewMacro(vtkSlicerVolumeResliceDriverLogic);
@@ -263,7 +265,6 @@ void vtkSlicerVolumeResliceDriverLogic
     }
   sliceIt->Delete();
   sliceNodes->Delete();
-
   this->Modified();
 }
 
@@ -510,6 +511,15 @@ void vtkSlicerVolumeResliceDriverLogic
     this->UpdateSliceByLine(position1, position2, sliceNode);
     return;
   }
+  vtkMRMLMarkupsFiducialNode* fidNode = vtkMRMLMarkupsFiducialNode::SafeDownCast(markupsNode);
+  if(fidNode)
+  {
+    double position1[3];
+    fidNode->GetNthControlPointPositionWorld(0,position1);
+    this->UpdateSliceByPoint(position1, sliceNode);
+    return;
+  }
+
 }
 
 /*
@@ -530,7 +540,16 @@ void vtkSlicerVolumeResliceDriverLogic
   rnode->GetPositionWorldCoordinates2(position2);
   this->UpdateSliceByLine(position1, position2, sliceNode);
 }
-
+void vtkSlicerVolumeResliceDriverLogic
+::UpdateSliceByPoint(double posistion1[3],vtkMRMLSliceNode*sliceNode)
+{
+    vtkNew<vtkMatrix4x4> pointTransform;
+    pointTransform->Identity(); // 设置为单位矩阵
+    pointTransform->SetElement(0, 3, posistion1[0]);
+    pointTransform->SetElement(1, 3, posistion1[1]);
+    pointTransform->SetElement(2, 3, posistion1[2]);
+    this->UpdateSlice(pointTransform,sliceNode);
+}
 void vtkSlicerVolumeResliceDriverLogic
 ::UpdateSliceByLine(double position1[3], double position2[3], vtkMRMLSliceNode* sliceNode)
 {

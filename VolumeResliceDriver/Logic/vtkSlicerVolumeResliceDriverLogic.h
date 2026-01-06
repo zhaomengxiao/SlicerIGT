@@ -50,7 +50,9 @@ public:
     MODE_CORONAL,
     MODE_INPLANE,
     MODE_INPLANE90,
-    MODE_TRANSVERSE
+    MODE_TRANSVERSE,
+    MODE_ImplantCurveTangent,
+    MODE_ImplantCurveNormal
   };
 
   /// Set attributes of MRML slice nodes to define reslice driver.

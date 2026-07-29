@@ -684,7 +684,7 @@ void vtkSlicerVolumeResliceDriverLogic ::UpdateSlice(
     sliceToRASTransform->Concatenate(driverToRasTranslation);
     sliceToRASTransform->RotateX(rotation - 90.0);
     sliceToRASTransform->RotateZ(flip * 180.0 + 180.0);
-    sliceToRASTransform->RotateY(90); // Frist, rotate to sagittal plane.
+    sliceToRASTransform->RotateY(-90); // Rotate to sagittal plane (-90 matches MODE_INPLANE facing).
     sliceToRASTransform->Update();
     break;
   case MODE_CORONAL:

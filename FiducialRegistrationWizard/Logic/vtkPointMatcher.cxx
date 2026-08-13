@@ -932,34 +932,17 @@ double vtkPointMatcher::ComputeRegistrationRootMeanSquareError( vtkPoints* sourc
   landmarkTransform->SetModeToRigidBody();
   landmarkTransform->Update();
 
-  vtkSmartPointer< vtkPolyData > sourcePointsPolyData = vtkSmartPointer< vtkPolyData >::New();
-  sourcePointsPolyData->SetPoints( sourcePoints );
-
-  vtkSmartPointer< vtkTransformPolyDataFilter > transformFilter = vtkSmartPointer< vtkTransformPolyDataFilter >::New();
-  transformFilter->SetTransform( landmarkTransform );
-  transformFilter->SetInputData( sourcePointsPolyData );
-  transformFilter->Update();
-
-  vtkPolyData* transformedSourcePointsPolyData = transformFilter->GetOutput();
-  if ( transformedSourcePointsPolyData == NULL )
-  {
-    vtkGenericWarningMacro( "Transformed source points poly data is null Returning default value " << RESET_VALUE_COMPUTED_ROOT_MEAN_DISTANCE_ERROR << "." );
-    return RESET_VALUE_COMPUTED_ROOT_MEAN_DISTANCE_ERROR;
-  }
-
-  vtkPoints* transformedSourcePoints = transformedSourcePointsPolyData->GetPoints();
-  if ( transformedSourcePoints == NULL )
-  {
-    vtkGenericWarningMacro( "Transformed source point list is null. Returning default value " << RESET_VALUE_COMPUTED_ROOT_MEAN_DISTANCE_ERROR << "." );
-    return RESET_VALUE_COMPUTED_ROOT_MEAN_DISTANCE_ERROR;
-  }
-
   int numberOfPoints = targetPoints->GetNumberOfPoints();
-  if ( transformedSourcePoints->GetNumberOfPoints() != numberOfPoints )
+  if ( sourcePoints->GetNumberOfPoints() != numberOfPoints )
   {
-    vtkGenericWarningMacro( "Point lists are not of same size " << transformedSourcePoints->GetNumberOfPoints() << " and " << numberOfPoints << ". Returning default value " << RESET_VALUE_COMPUTED_ROOT_MEAN_DISTANCE_ERROR << "." );
+    vtkGenericWarningMacro( "Point lists are not of same size " << sourcePoints->GetNumberOfPoints() << " and " << numberOfPoints << ". Returning default value " << RESET_VALUE_COMPUTED_ROOT_MEAN_DISTANCE_ERROR << "." );
     return RESET_VALUE_COMPUTED_ROOT_MEAN_DISTANCE_ERROR;
   }
+
+  vtkSmartPointer< vtkPoints > transformedSourcePoints = vtkSmartPointer< vtkPoints >::New();
+  transformedSourcePoints->SetDataType( sourcePoints->GetDataType() );
+  transformedSourcePoints->Allocate( numberOfPoints );
+  landmarkTransform->TransformPoints( sourcePoints, transformedSourcePoints );
 
   double sumOfSquaredDistances = 0.0;
   for ( int pointIndex = 0; pointIndex < numberOfPoints; pointIndex++ )
